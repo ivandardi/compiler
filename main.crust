@@ -1,0 +1,12 @@
+
+fn melo() -> void {
+    let a = 12;
+}
+
+fn nothing() -> void {
+
+}
+
+fn main() -> void {
+    let x = 10;
+}

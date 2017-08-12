@@ -1,0 +1,62 @@
+use std::str::FromStr;
+use ast::{Expr, Opcode, VarDecl, FnDecl};
+
+grammar;
+
+pub file = <program>;
+
+program = <function_declaration*>;
+
+function_declaration: FnDecl = "fn" <identifier> "->" <type_declaration> <block> => FnDecl::new(<>);
+
+block = "{" <statement_or_expression*> "}";
+
+statement_or_expression = {
+    <statement>,
+    <statement> <nonblock_expr>,
+    <nonblock_expr>,
+};
+
+statement = {
+    <full_block_expr>,
+    <block>,
+    <nonblock_expr> ";",
+    ";",
+};
+
+nonblock_expr = {
+    <identifier>,
+
+};
+
+variable_declaration: VarDecl = "let" <identifier> "=" <expression> ";" => VarDecl::new(<>);
+
+
+Tier<Op, NextTier>: Box<Expr> = {
+    Tier<Op, NextTier> Op NextTier => Box::new(Expr::Op(<>)),
+    NextTier,
+};
+
+expression = Tier<expression_operator, factor>;
+
+factor = Tier<factor_operator, term>;
+
+expression_operator: Opcode = {
+    "+" => Opcode::Add,
+    "-" => Opcode::Sub,
+};
+
+factor_operator: Opcode = {
+    "*" => Opcode::Mul,
+    "/" => Opcode::Div,
+};
+
+term: Box<Expr> = {
+    number => Box::new(Expr::Number(<>)),
+    "(" <expression> ")",
+    <identifier>,
+};
+
+number: i64 = r"[0-9]+" => i64::from_str(<>).unwrap();
+
+identifier: Box<Expr> = r"[a-zA-Z_]\w*" => Box::new(Expr::Ident(<>.to_string()));
