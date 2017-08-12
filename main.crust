@@ -1,6 +1,24 @@
+fn partition(vec: []i32, lo: i32, hi: i32) -> i32 {
+    let pivot: i32 = vec[hi];
+    let i: i32 = low - 1;
+    let j: i32 = lo;
+    while j <= hi - 1 {
+        if arr[j] <= pivot {
+            i = i + 1;
+            swap(vec, i, j);
+        }
+    }
+    swap(vec, i + 1, hi);
+    return i + 1;
+}
 
-fn melo() -> void {
-    let a = 12;
+fn quicksort(vec: []i32, lo: i32, hi: i32) -> void {
+    let pivot: i32;
+    if low < high {
+        pivot = partition(vec, lo, hi);
+        quicksort(vec, low, pivot - 1);
+        quicksort(vec, pivot + 1, hi);
+    }
 }
 
 fn nothing() -> void {

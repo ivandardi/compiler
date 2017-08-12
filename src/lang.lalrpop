@@ -7,30 +7,51 @@ pub file = <program>;
 
 program = <function_declaration*>;
 
-function_declaration: FnDecl = "fn" <identifier> "->" <type_declaration> <block> => FnDecl::new(<>);
+function_declaration: FnDecl = "fn" <identifier> /*ADD parameters*/ "->" <type_declaration> <function_block> => FnDecl::new(<>);
 
-block = "{" <statement_or_expression*> "}";
+function_block = "{" <variable_declaration*> <statement*> "}";
 
-statement_or_expression = {
-    <statement>,
-    <statement> <nonblock_expr>,
-    <nonblock_expr>,
-};
+variable_declaration: VarDecl = "let" <identifier> (":" <type_declaration> "=" <expression>)? ";" => VarDecl::new(<>);
 
 statement = {
-    <full_block_expr>,
-    <block>,
     <nonblock_expr> ";",
-    ";",
+    <if_statement>,
+    <while_statement>,
+    <return_statement>,
+    "{" <statement*> "}",
 };
+
+if_statement = "if" <nonblock_expr> "{" <statement*> "}" ("else" "{" <statement*> "}")?;
+
+while_statement = "while" <nonblock_expr> "{" <statement*> "}";
+
+return_statement = "return" <nonblock_expr?> ";";
 
 nonblock_expr = {
-    <identifier>,
-
+    <variable>,
+    <function_call>,
+    <comparison>,
 };
 
-variable_declaration: VarDecl = "let" <identifier> "=" <expression> ";" => VarDecl::new(<>);
+variable = {
+    identifier,
+    identifier "[" <nonblock_expr> "]",
+}
 
+function_call = identifier "(" (<nonblock_expr> ",")* <nonblock_expr?> ")";
+
+comparison = {
+    <expression> <relational> <expression>
+};
+
+relational = {
+    "==",
+    "!=",
+    "<",
+    ">",
+    "<=",
+    ">=",
+};
 
 Tier<Op, NextTier>: Box<Expr> = {
     Tier<Op, NextTier> Op NextTier => Box::new(Expr::Op(<>)),
@@ -55,6 +76,7 @@ term: Box<Expr> = {
     number => Box::new(Expr::Number(<>)),
     "(" <expression> ")",
     <identifier>,
+    // function calls go here
 };
 
 number: i64 = r"[0-9]+" => i64::from_str(<>).unwrap();
