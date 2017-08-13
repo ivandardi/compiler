@@ -1,43 +1,34 @@
-use std::fmt::{Debug, Formatter, Error};
+#[derive(Debug, Clone)]
+pub struct Function {
+    pub identifier: Box<Expr>,
+    pub params: Vec<(Box<Expr>, Type)>,
+    pub ret: Type,
+    pub declarations: Vec<VarDecl>,
+    pub statements: Vec<Statement>,
+}
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone)]
 pub struct VarDecl {
-    identifier: String,
-    expression: Box<Expr>,
+    pub identifier: Box<Expr>,
+    pub ty: Type,
+    pub expression: Option<Box<Expr>>,
 }
 
-impl VarDecl {
-    pub fn new(identifier: Box<Expr>, expression: Box<Expr>) ->Self {
-        use self::Expr::*;
-        let identifier = match *identifier {
-            Ident(id) => id.to_string(),
-            _ => panic!("Invalid ID"),
-        };
-        VarDecl {
-            identifier: identifier,
-            expression,
-        }
-    }
+#[derive(Debug, Clone)]
+pub enum Statement {
+    Expression(Box<Expr>),
+    Assignment(Box<Expr>, Box<Expr>),
+    If(Comparison, Vec<Statement>, Option<Vec<Statement>>),
+    While(Comparison, Vec<Statement>),
+    Return(Option<Box<Expr>>),
+    Block(Vec<Statement>),
 }
 
-#[derive(Debug, Copy, Clone)]
-pub struct FnDecl {
-    identifier: String,
-    statements: Vec<VarDecl>,
-}
-
-impl FnDecl {
-    pub fn new(identifier: Box<Expr>, statements: Vec<VarDecl>) -> Self {
-        use self::Expr::*;
-        let identifier = match *identifier {
-            Ident(id) => id.to_string(),
-            _ => panic!("Invalid ID"),
-        };
-        FnDecl {
-            identifier,
-            statements,
-        }
-    }
+#[derive(Debug, Clone)]
+pub struct Comparison {
+    pub lhs: Box<Expr>,
+    pub rhs: Box<Expr>,
+    pub operator: CmpOperator,
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -50,20 +41,6 @@ pub enum CmpOperator {
     Ge,
 }
 
-impl Debug for CmpOperator {
-    fn fmt(&self, fmt: &mut Formatter) -> Result<(), Error> {
-        use self::CmpOperator::*;
-        write!(fmt, match *self {
-            Eq => "==",
-            Ne => "!=",
-            Lt => "<",
-            Gt => ">",
-            Le => "<=",
-            Ge => ">=",
-        });
-    }
-}
-
 #[derive(Debug, Copy, Clone)]
 pub enum Opcode {
     Mul,
@@ -72,48 +49,30 @@ pub enum Opcode {
     Sub,
 }
 
-impl Debug for Opcode {
-    fn fmt(&self, fmt: &mut Formatter) -> Result<(), Error> {
-        use self::Opcode::*;
-        write!(fmt, match *self {
-            Mul => "*",
-            Div => "/",
-            Add => "+",
-            Sub => "-",
-        });
-    }
-}
-
 #[derive(Debug, Clone)]
 pub enum Type {
     I64,
-    Array(Box(Type)),
-}
-
-impl Debug for Type {
-    fn fmt(&self, fmt: &mut Formatter) -> Result<(), Error> {
-        use self::Type::*;
-        match *self {
-            I64 => write!(fmt, "i64"),
-            Array(ty) => write!(fmt, "[]{:?}", ty),
-        }
-    }
+    Bool,
+    Array(Box<Type>),
 }
 
 #[derive(Debug, Clone)]
 pub enum Expr {
-    Ident(String),
     Number(i64),
+    Bool(bool),
+    Operation(Box<Expr>, Opcode, Box<Expr>),
+    Variable(Variable),
+    FunctionCall {
+        identifier: Box<Expr>,
+        arg_list: Vec<Box<Expr>>,
+    },
 }
 
-impl Debug for Expr {
-    fn fmt(&self, fmt: &mut Formatter) -> Result<(), Error> {
-        use self::Expr::*;
-        match *self {
-            Number(n) => write!(fmt, "{}", n),
-            Ident(ref id) =>  write!(fmt, "{}", id),
-        }
-    }
+#[derive(Debug, Clone)]
+pub enum Variable {
+    Id(String),
+    Vec {
+        identifier: Box<Expr>,
+        index: Box<Expr>,
+    },
 }
-
-#[derive(Debug, Copy, Clone)]

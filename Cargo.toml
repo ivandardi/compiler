@@ -1,8 +1,9 @@
 [package]
-authors = ["Ivan Dardi <ivy.dardi@gmail.com>"]
-build = "build.rs"
 name = "compiler"
 version = "0.1.0"
+authors = ["Ivan Dardi <ivy.dardi@gmail.com>"]
+build = "build.rs"
+
 [build-dependencies]
 lalrpop = "0.13.1"
 
