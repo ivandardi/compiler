@@ -9,7 +9,7 @@ pub fn semantic_check(ast: &[ast::Function]) -> Result<(), String> {
 fn check_main_function(ast: &[ast::Function]) -> Result<(), String> {
     let main_fn = ast
         .iter()
-        .find(|ref fun| fun.id.0 == "main")
+        .find(|fun| fun.id.0 == "main")
         .ok_or("Main function not found!")?;
 
     if main_fn.params != vec![] {
@@ -24,7 +24,7 @@ fn check_main_function(ast: &[ast::Function]) -> Result<(), String> {
 fn check_void_variables(ast: &[ast::Function]) -> Result<(), String> {
     for fun in ast {
         for stmt in &fun.stmts {
-            if let &ast::Statement::VarDecl {ref ty, ..} = stmt {
+            if let ast::Statement::VarDecl {ref ty, ..} = *stmt {
                 if *ty == ast::Type::Void {
                     return Err(String::from("Can't declare a variable with a void type!"));
                 }
