@@ -1,58 +1,31 @@
 #[derive(Debug, Clone)]
 pub struct Function {
-    pub identifier: Box<Expr>,
-    pub params: Vec<(Box<Expr>, Type)>,
+    pub id: Id,
+    pub params: Vec<(Id, Type)>,
     pub ret: Type,
-    pub declarations: Vec<VarDecl>,
-    pub statements: Vec<Statement>,
-}
-
-#[derive(Debug, Clone)]
-pub struct VarDecl {
-    pub identifier: Box<Expr>,
-    pub ty: Type,
-    pub expression: Option<Box<Expr>>,
+    pub stmts: Vec<Statement>,
 }
 
 #[derive(Debug, Clone)]
 pub enum Statement {
+    VarDecl {
+        id: Id,
+        ty: Type,
+        expr: Option<Box<Expr>>,
+    },
     Expression(Box<Expr>),
-    Assignment(Box<Expr>, Box<Expr>),
-    If(Comparison, Vec<Statement>, Option<Vec<Statement>>),
-    While(Comparison, Vec<Statement>),
+    Assignment(Variable, Box<Expr>),
+    If(Box<Expr>, Vec<Statement>, Option<Vec<Statement>>),
+    Loop(Box<Expr>, Vec<Statement>),
     Return(Option<Box<Expr>>),
     Block(Vec<Statement>),
 }
 
-#[derive(Debug, Clone)]
-pub struct Comparison {
-    pub lhs: Box<Expr>,
-    pub rhs: Box<Expr>,
-    pub operator: CmpOperator,
-}
-
-#[derive(Debug, Copy, Clone)]
-pub enum CmpOperator {
-    Eq,
-    Ne,
-    Lt,
-    Gt,
-    Le,
-    Ge,
-}
-
-#[derive(Debug, Copy, Clone)]
-pub enum Opcode {
-    Mul,
-    Div,
-    Add,
-    Sub,
-}
-
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum Type {
     I64,
     Bool,
+    Void,
     Array(Box<Type>),
 }
 
@@ -60,19 +33,30 @@ pub enum Type {
 pub enum Expr {
     Number(i64),
     Bool(bool),
-    Operation(Box<Expr>, Opcode, Box<Expr>),
+    Operation(Box<Expr>, BinOp, Box<Expr>),
     Variable(Variable),
-    FunctionCall {
-        identifier: Box<Expr>,
-        arg_list: Vec<Box<Expr>>,
-    },
+    FunctionCall { id: Id, args: Vec<Box<Expr>> },
 }
 
 #[derive(Debug, Clone)]
 pub enum Variable {
-    Id(String),
-    Vec {
-        identifier: Box<Expr>,
-        index: Box<Expr>,
-    },
+    Id(Id),
+    Vec { id: Id, index: Box<Expr> },
+}
+
+#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq)]
+pub struct Id(pub String);
+
+#[derive(Debug, Copy, Clone)]
+pub enum BinOp {
+    Mul,
+    Div,
+    Add,
+    Sub,
+    Eq,
+    Ne,
+    Lt,
+    Gt,
+    Le,
+    Ge,
 }
