@@ -22,12 +22,12 @@ fn test_void_function() {
 }
 
 #[test]
+#[should_panic]
 fn test_void_variable() {
     test_code("tests/crust_void_variable.crust");
 }
 
 #[test]
-#[should_panic]
 fn test_simple_function() {
     test_code("tests/crust_simple_function.crust");
 }
