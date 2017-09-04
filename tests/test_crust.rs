@@ -6,18 +6,11 @@ use std::env;
 fn test_code(filename: &str) {
     let code = get_code(filename).expect("Failed to get code");
     let results = compile(&code);
-
     if let Err(results) = results {
         if let Ok(_) = env::var("PRINT_ERR") {
             eprintln!("Error: {}", results);
         }
         panic!("Error on {}!", filename);
-    }
-
-    if let Ok(value) = env::var("PRINT_AST") {
-        if value == "1" {
-            println!("{:#?}", results);
-        }
     }
 }
 

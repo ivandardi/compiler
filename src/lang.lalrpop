@@ -1,5 +1,5 @@
 use std::str::FromStr;
-use ast::{Ast, Function, Statement, Type, Expr, Variable, Id, BinOp};
+use ast::{Ast, Statement, Type, TypePrimitive, Expr, Variable, Id, BinOp, Declaration, DeclarationData};
 
 grammar;
 
@@ -14,88 +14,81 @@ Comma<T>: Vec<T> = <v:(<T> ",")*> <e:T?> => match e {
 };
 
 // Macro for tiers of expression precedence
-Tier<Op, NextTier>: Box<Expr> = {
-    Tier<Op, NextTier> Op NextTier => Box::new(Expr::Operation(<>)),
+Tier<Op, NextTier>: Expr = {
+    <lhs:Tier<Op, NextTier>> <op:Op> <rhs:NextTier> => Expr::Operation(Box::new(lhs), op, Box::new(rhs)),
     NextTier,
 };
 
 pub file: Ast = program => Ast::new(<>);
 
-program = function_declaration*;
+program = declaration*;
 
-function_declaration: Function = {
-    "fn" <id:identifier> "(" <params:function_params> ")" <ret_type:("->" <type_declaration>)?> "{" <stmts:statement*> "}" => {
-        let ret = ret_type.unwrap_or(Type::Void);
-        Function {
-            id,
+declaration = {
+    function_declaration,
+    variable_declaration,
+};
+
+function_declaration: Declaration = {
+    "fn" <id:identifier>
+    "(" <params:Comma<(<identifier> ":" <type_declaration>)>> ")"
+    <ret_type:("->" <type_declaration>)?>
+    "{" <stmts:statement*> "}" => {
+        let ty = Type::Function {
             params,
-            ret,
-            stmts,
+            ret: Box::new(ret_type.unwrap_or(Type::Primitive(TypePrimitive::Void))),
+        };
+        Declaration {
+            id,
+            ty,
+            data: DeclarationData::Function(stmts),
         }
     }
 };
 
-function_params: Vec<(Id, Type)> = Comma<(<identifier> ":" <type_declaration>)>;
+variable_declaration: Declaration = {
+    "let" <id:identifier> ":" <ty:type_declaration>
+    <expr:("=" <expression>)?>
+    ";" => {
+        Declaration {
+            id,
+            ty,
+            data: DeclarationData::Variable(expr),
+        }
+    }
+};
 
 statement: Statement = {
-    variable_declaration,
-    expression_statement,
-    assign_statement,
-    if_statement,
-    while_statement,
-    return_statement,
+    declaration => Statement::Declaration(<>),
+    statement_expression,
+    statement_assign,
+    statement_if,
+    statement_while,
+    statement_return,
     statement_block,
 };
 
-variable_declaration: Statement = {
-    "let" <id:identifier> ":" <ty:type_declaration> <expr:("=" <expression>)?> ";" => Statement::VarDecl {<>},
+statement_expression: Statement = <expression> ";" => Statement::Expression(<>);
+
+statement_assign: Statement = <variable> "=" <expression> ";" => Statement::Assignment(<>);
+
+statement_if: Statement = {
+    "if" <comparison> "{" <statement*> "}"
+    <("else" "{" <statement*> "}")?> => {
+        Statement::If(<>)
+    }
 };
 
-expression_statement: Statement = <expression> ";" => Statement::Expression(<>);
+statement_while: Statement = "while" <comparison> "{" <statement*> "}" => Statement::Loop(<>);
 
-assign_statement: Statement = <variable> "=" <expression> ";" => Statement::Assignment(<>);
-
-if_statement: Statement = "if" <comparison> "{" <statement*> "}" <("else" "{" <statement*> "}")?> => Statement::If(<>);
-
-while_statement: Statement = "while" <comparison> "{" <statement*> "}" => Statement::Loop(<>);
-
-return_statement: Statement = "return" <expression?> ";" => Statement::Return(<>);
+statement_return: Statement = "return" <expression?> ";" => Statement::Return(<>);
 
 statement_block: Statement = "{" <statement*> "}" => Statement::Block(<>);
 
-comparison: Box<Expr> = expression relational expression => Box::new(Expr::Operation(<>));
+comparison: Expr = <lhs:expression> <op:relational> <rhs:expression> => Expr::Operation(Box::new(lhs), op, Box::new(rhs));
 
 expression = Tier<expression_operator, factor>;
 
 factor = Tier<factor_operator, term>;
-
-term: Box<Expr> = {
-    "(" <expression> ")",
-    number,
-    boolean,
-    function_call,
-    variable => Box::new(Expr::Variable(<>)),
-};
-
-variable: Variable = {
-    identifier => Variable::Id(<>),
-    <id:identifier> "[" <index:expression> "]" => Variable::Vec {<>},
-};
-
-function_call: Box<Expr> = <id:identifier> "(" <args:function_args> ")" => {
-    Box::new(Expr::FunctionCall{<>})
-};
-
-function_args: Vec<Box<Expr>> = Comma<expression>;
-
-relational: BinOp = {
-    "==" => BinOp::Eq,
-    "!=" => BinOp::Ne,
-    "<"  => BinOp::Lt,
-    ">"  => BinOp::Gt,
-    "<=" => BinOp::Le,
-    ">=" => BinOp::Ge,
-};
 
 expression_operator: BinOp = {
     "+" => BinOp::Add,
@@ -107,18 +100,46 @@ factor_operator: BinOp = {
     "/" => BinOp::Div,
 };
 
+term: Expr = {
+    "(" <expression> ")",
+    number,
+    boolean,
+    function_call,
+    variable => Expr::Variable(<>),
+};
+
+variable: Variable = {
+    identifier => Variable::Id(<>),
+    <id:identifier> "[" <index:expression> "]" => Variable::Vec {id, index: Box::new(index)},
+};
+
+function_call: Expr = <id:identifier> "(" <args:function_args> ")" => {
+    Expr::FunctionCall{<>}
+};
+
+function_args: Vec<Expr> = Comma<expression>;
+
+relational: BinOp = {
+    "==" => BinOp::Eq,
+    "!=" => BinOp::Ne,
+    "<"  => BinOp::Lt,
+    ">"  => BinOp::Gt,
+    "<=" => BinOp::Le,
+    ">=" => BinOp::Ge,
+};
+
 type_declaration: Type = {
-    "i64" => Type::I64,
-    "bool" => Type::Bool,
-    "void" => Type::Void,
+    "i64" => Type::Primitive(TypePrimitive::I64),
+    "bool" => Type::Primitive(TypePrimitive::Bool),
+    "void" => Type::Primitive(TypePrimitive::Void),
     "[]" <type_declaration> => Type::Array(Box::new(<>)),
 };
 
-number: Box<Expr> = r"[+-]?\d+" => Box::new(Expr::Number(i64::from_str(<>).unwrap()));
+number: Expr = r"[+-]?\d+" => Expr::Number(i64::from_str(<>).unwrap());
 
-boolean: Box<Expr> = {
-    "true" => Box::new(Expr::Bool(true)),
-    "false" => Box::new(Expr::Bool(false)),
+boolean: Expr = {
+    "true" => Expr::Bool(true),
+    "false" => Expr::Bool(false),
 };
 
 identifier: Id = r"[a-zA-Z_]\w*" => Id(<>.to_string());

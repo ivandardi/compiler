@@ -8,5 +8,5 @@ pub enum Expr {
     Bool(bool),
     Operation(Box<Expr>, BinOp, Box<Expr>),
     Variable(Variable),
-    FunctionCall { id: Id, args: Vec<Box<Expr>> },
+    FunctionCall { id: Id, args: Vec<Expr> },
 }

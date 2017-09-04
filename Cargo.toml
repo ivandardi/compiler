@@ -1,12 +1,13 @@
 [package]
-name = "compiler"
-version = "0.1.0"
 authors = ["Ivan Dardi <ivy.dardi@gmail.com>"]
 build = "build.rs"
+name = "compiler"
+version = "0.1.0"
 
 [build-dependencies]
-lalrpop = "0.13.1"
+lalrpop = { git = "https://github.com/nikomatsakis/lalrpop.git" }
 
 [dependencies]
-lalrpop-util = "0.13.1"
-regex = "0.2.2"
+derive-error = "0.0.3"
+lalrpop-util = { git = "https://github.com/nikomatsakis/lalrpop.git" }
+regex = "0.2"

@@ -5,5 +5,5 @@ use super::expression::Expr;
 #[derive(Debug, Clone, Hash)]
 pub enum Variable {
     Id(Id),
-    Vec { id: Id, index: Box<Expr> },
+    Vec {id: Id, index: Box<Expr>},
 }

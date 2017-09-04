@@ -13,6 +13,6 @@ fn main() {
     let results = compile(&code);
 
     if let Err(results) = results {
-        panic!("Error: {}", results);
+        eprintln!("Error: {:#?}", results);
     }
 }

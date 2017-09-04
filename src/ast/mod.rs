@@ -1,30 +1,30 @@
 mod binary_operator;
+mod declaration;
 mod expression;
-mod function;
 mod id;
 mod statement;
 mod types;
 mod variable;
 
 pub use self::binary_operator::BinOp;
+pub use self::declaration::{Declaration, DeclarationData};
 pub use self::expression::Expr;
-pub use self::function::Function;
 pub use self::id::Id;
 pub use self::statement::Statement;
-pub use self::types::Type;
+pub use self::types::{Type, TypePrimitive};
 pub use self::variable::Variable;
 
 #[derive(Debug)]
-pub struct Ast(pub Vec<Function>);
+pub struct Ast(pub Vec<Declaration>);
 
 impl Ast {
-    pub fn new(vec: Vec<Function>) -> Self {
+    pub fn new(vec: Vec<Declaration>) -> Self {
         Ast(vec)
     }
 }
 
 impl ::std::ops::Deref for Ast {
-    type Target = [Function];
+    type Target = [Declaration];
 
     fn deref(&self) -> &Self::Target {
         self.0.deref()
@@ -38,8 +38,8 @@ impl ::std::ops::DerefMut for Ast {
 }
 
 impl IntoIterator for Ast {
-    type Item = Function;
-    type IntoIter = ::std::vec::IntoIter<Function>;
+    type Item = Declaration;
+    type IntoIter = ::std::vec::IntoIter<Declaration>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.into_iter()
@@ -47,8 +47,8 @@ impl IntoIterator for Ast {
 }
 
 impl<'a> IntoIterator for &'a Ast {
-    type Item = &'a Function;
-    type IntoIter = ::std::slice::Iter<'a, Function>;
+    type Item = &'a Declaration;
+    type IntoIter = ::std::slice::Iter<'a, Declaration>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.iter()
@@ -56,8 +56,8 @@ impl<'a> IntoIterator for &'a Ast {
 }
 
 impl<'a> IntoIterator for &'a mut Ast {
-    type Item = &'a mut Function;
-    type IntoIter = ::std::slice::IterMut<'a, Function>;
+    type Item = &'a mut Declaration;
+    type IntoIter = ::std::slice::IterMut<'a, Declaration>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.iter_mut()
