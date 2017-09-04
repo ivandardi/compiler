@@ -1,5 +1,5 @@
 use std::str::FromStr;
-use ast::{Function, Statement, Type, Expr, Variable, Id, BinOp};
+use ast::{Ast, Function, Statement, Type, Expr, Variable, Id, BinOp};
 
 grammar;
 
@@ -19,9 +19,9 @@ Tier<Op, NextTier>: Box<Expr> = {
     NextTier,
 };
 
-pub file = <program>;
+pub file: Ast = program => Ast::new(<>);
 
-program = <function_declaration*>;
+program = function_declaration*;
 
 function_declaration: Function = {
     "fn" <id:identifier> "(" <params:function_params> ")" <ret_type:("->" <type_declaration>)?> "{" <stmts:statement*> "}" => {

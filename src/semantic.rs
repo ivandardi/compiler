@@ -1,12 +1,12 @@
 use ast;
 
-pub fn semantic_check(ast: &[ast::Function]) -> Result<(), String> {
+pub fn semantic_check(ast: &ast::Ast) -> Result<(), String> {
     check_main_function(ast)?;
     check_void_variables(ast)?;
     Ok(())
 }
 
-fn check_main_function(ast: &[ast::Function]) -> Result<(), String> {
+fn check_main_function(ast: &ast::Ast) -> Result<(), String> {
     let main_fn = ast
         .iter()
         .find(|fun| fun.id.0 == "main")
@@ -21,7 +21,7 @@ fn check_main_function(ast: &[ast::Function]) -> Result<(), String> {
     Ok(())
 }
 
-fn check_void_variables(ast: &[ast::Function]) -> Result<(), String> {
+fn check_void_variables(ast: &ast::Ast) -> Result<(), String> {
     for fun in ast {
         for stmt in &fun.stmts {
             if let ast::Statement::VarDecl {ref ty, ..} = *stmt {

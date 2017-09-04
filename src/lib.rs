@@ -20,13 +20,8 @@ pub fn get_code(filename: &str) -> io::Result<String> {
     Ok(code)
 }
 
-pub fn compile(code: &str) -> Result<Vec<ast::Function>, String> {
+pub fn compile(code: &str) -> Result<ast::Ast, String> {
     let results = lang::parse_file(code).map_err(|e| format!("{:?}", e))?;
     semantic::semantic_check(&results)?;
     Ok(results)
 }
-
-// TODO symbol table
-// Name(ID)   Type(IC)   Type(Data)    Scope     Time of Discovery
-// foo        fn         I64           global
-// bar        var        Bool          foo
