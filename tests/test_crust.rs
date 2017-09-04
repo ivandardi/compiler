@@ -8,11 +8,16 @@ fn test_code(filename: &str) {
     let results = compile(&code);
 
     if let Err(results) = results {
-        panic!("Error: {}", results);
+        if let Ok(_) = env::var("PRINT_ERR") {
+            eprintln!("Error: {}", results);
+        }
+        panic!("Error on {}!", filename);
     }
 
-    if env::var("PRINT_AST").is_ok() {
-        println!("{:#?}", results);
+    if let Ok(value) = env::var("PRINT_AST") {
+        if value == "1" {
+            println!("{:#?}", results);
+        }
     }
 }
 
@@ -36,6 +41,11 @@ fn test_simple_function() {
 #[should_panic]
 fn test_mainless() {
     test_code("tests/crust_mainless.crust");
+}
+
+#[test]
+fn test_matrix() {
+    test_code("tests/crust_matrix.crust");
 }
 
 #[test]
