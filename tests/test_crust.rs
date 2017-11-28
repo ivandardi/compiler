@@ -7,13 +7,12 @@ fn test_code(filename: &str) {
     let code = get_code(filename).expect("Failed to get code");
     let results = compile(&code);
     if let Err(results) = results {
-        if let Ok(_) = env::var("PRINT_ERR") {
-            eprintln!("Error: {}", results);
-        }
+        eprintln!("Error: {}", results);
         panic!("Error on {}!", filename);
     }
 }
 
+/*
 #[test]
 fn test_void_function() {
     test_code("tests/crust_void_function.crust");
@@ -45,4 +44,34 @@ fn test_matrix() {
 #[ignore]
 fn test_quicksort() {
     test_code("tests/crust_quicksort.crust");
+}
+*/
+
+#[test]
+fn test_0() {
+    test_code("tests/0.crust");
+}
+
+#[test]
+#[should_panic]
+fn test_1() {
+    test_code("tests/1.crust");
+}
+
+#[test]
+#[should_panic]
+fn test_2() {
+    test_code("tests/2.crust");
+}
+
+#[test]
+#[should_panic]
+fn test_3() {
+    test_code("tests/3.crust");
+}
+
+#[test]
+#[should_panic]
+fn test_4() {
+    test_code("tests/4.crust");
 }

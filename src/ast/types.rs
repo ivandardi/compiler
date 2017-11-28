@@ -17,7 +17,7 @@ pub enum Type {
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum TypePrimitive {
-    I64,
+    Int,
     Bool,
     Void,
 }
@@ -34,7 +34,7 @@ impl fmt::Display for Type {
             },
             Array(ref types) => format!("[]{}", types),
             Primitive(ty) => match ty {
-                I64 => "I64".to_string(),
+                Int => "Int".to_string(),
                 Bool => "Bool".to_string(),
                 Void => "Void".to_string(),
             },

@@ -129,7 +129,7 @@ relational: BinOp = {
 };
 
 type_declaration: Type = {
-    "i64" => Type::Primitive(TypePrimitive::I64),
+    "int" => Type::Primitive(TypePrimitive::Int),
     "bool" => Type::Primitive(TypePrimitive::Bool),
     "void" => Type::Primitive(TypePrimitive::Void),
     "[]" <type_declaration> => Type::Array(Box::new(<>)),

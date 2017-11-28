@@ -1,0 +1,40 @@
+let a: int;
+
+fn gdc(u: int, v: int) -> int {
+    if v == 0 {
+        return u;
+    } else {
+        return gdc(v, u - u / v * v);
+    }
+}
+
+fn input()
+{
+}
+
+fn output(x: int)
+{
+}
+
+fn main() {
+    let x: int;
+    let y: int;
+    let u: int;
+    let v: []int;
+
+    x = input();
+    y = input();
+    output(gdc(x,y));
+
+    a = &1;
+
+    u = 0;
+    x = 1;
+    while x <= 10 {
+        u = u * 2;
+        v[x] = u;
+        x = x + 1;
+    }
+
+    return;
+}

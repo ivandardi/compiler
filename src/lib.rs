@@ -10,10 +10,7 @@ extern crate derive_error;
 mod lang;
 mod errors;
 mod ast;
-mod semantic;
-mod symbol_table;
 
-use symbol_table::SymbolTable;
 use std::fs::File;
 use std::env;
 use std::io;
@@ -30,13 +27,8 @@ pub fn compile(code: &str) -> Result<ast::Ast, String> {
 //    let (ast, symbol_table) = SymbolTable::new(ast);
 //    let results = semantic::check(&ast, &symbol_table)?;
 
-    if let Err(_) = env::var("NO_AST") {
-        println!("{:#?}", ast);
-    }
-
-    if let Err(_) = env::var("NO_SEM") {
-        println!("{}", symbol_table);
-    }
+    println!("{:#?}", ast);
+    println!("{}", ast);
 
     Ok(ast)
 }
