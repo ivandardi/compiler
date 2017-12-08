@@ -1,39 +1,48 @@
+/* gdc com erro semantico - verificacao de tipos */
+
 let a: int;
 
-fn gdc(u: int, v: int) -> int {
-    if v == 0 {
-        return u;
-    } else {
-        return gdc(v, u - u / v * v);
-    }
+/* teste de funcao com parametros e corpo sem declaracoes */
+fn gdc (u: int, v: int): int {
+    /* teste de selecao, expressoes, return e chamada de funcao */
+    if v == 0 { return u; }
+    else { return gdc(v, u - u / v * v); }
 }
 
-fn input()
-{
-
-fn output(x: int)
-{
+/* teste de funcao sem parametros e sem corpo */
+fn input(): int {
 }
 
-fn main() {
-    let x: int;
-    let y: int;
-    let u: int;
-    let v: []int;
+/* teste de funcao com parametro e sem corpo */
+fn output(x: int): void {
+}
 
-    x = input();
-    y = input();
-    output(gdc(x,y));
+/* teste de funcao sem parametro e com corpo completo */
+fn main(): void {
+   /* teste de diferentes tipos de variaveis, incluindo vetor */
+   let x: int;
+   let y: int;
+   let u: int;
+   let v: []int;
 
-    a = 1;
+   u = output(x); /* erro semantico: valor de retorno de funcao e void */
 
-    u = 0;
-    x = 1;
-    while x <= 10 {
-        u = u * 2;
-        v[x] = u;
-        x = x + 1;
-    }
+   /* chamadas de funoees */
+   x = input();
+   y = input();
+   output(gdc(x, y));
 
-    return;
+   a = 1;
+
+   /* teste atribuicao e repeticao */
+   u = 0;
+   x = 1;
+   while x <= 10 {
+      u = u * 2;
+      v[x] = u;
+      x = x + 1;
+   }
+
+   /* teste return simples */
+   return;
 }

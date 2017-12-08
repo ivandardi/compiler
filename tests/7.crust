@@ -1,0 +1,47 @@
+/* gdc com erro semantico - nome de variavel duplicado com funcao */
+
+let a: int;
+
+/* teste de funcao com parametros e corpo sem declaracoes */
+fn gdc (u: int, v: int): int {
+    /* teste de selecao, expressoes, return e chamada de funcao */
+    if v == 0 { return u; }
+    else { return gdc(v, u - u / v * v); }
+}
+
+/* teste de funcao sem parametros e sem corpo */
+fn input(): int {
+}
+
+/* teste de funcao com parametro e sem corpo */
+fn output(x: int): void {
+}
+
+/* teste de funcao sem parametro e com corpo completo */
+fn main(): void {
+   /* teste de diferentes tipos de variaveis, incluindo vetor */
+   let input: int; /* erro semantico - nome duplicado com de funcao */
+   let x: int;
+   let y: int;
+   let u: int;
+   let v: []int;
+
+   /* chamadas de funoees */
+   x = input();
+   y = input();
+   output(gdc(x, y));
+
+   a = 1;
+
+   /* teste atribuicao e repeticao */
+   u = 0;
+   x = 1;
+   while x <= 10 {
+      u = u * 2;
+      v[x] = u;
+      x = x + 1;
+   }
+
+   /* teste return simples */
+   return;
+}

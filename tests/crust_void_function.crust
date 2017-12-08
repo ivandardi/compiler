@@ -1,5 +1,0 @@
-fn void_function() {
-    let a: i64 = -1;
-}
-
-fn main() {}
