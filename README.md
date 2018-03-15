@@ -3,8 +3,11 @@
 ## Useful links to learn Python
 
 http://python.swaroopch.com/ (great book)
+
 https://learnxinyminutes.com/docs/python3/ (for people who know programming already)
+
 https://automatetheboringstuff.com/ (for complete beginners to programming)
+
 https://docs.python.org/3.6/tutorial/ (official tutorial)
 
 ## How to run
